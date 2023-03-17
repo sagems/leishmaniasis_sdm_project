@@ -114,11 +114,16 @@ drop <- c("latitude", "longitude", "row_identifier", "focal","bio5", "bio13", "b
 climate_data <- climate_data[,(names(climate_data) %in% drop)]
 write.csv(climate_data, "/Users/sagemcginley-smith/Desktop/mordecai_lab/sdm_project/initial_training_data.csv")
 ```
-![Correlation Plot for All Variables](corr_plot.png "Correlation Plot for All Variablesn")
+![Correlation Plot for All Variables](corr_plot.png "Correlation Plot for All Variables")
 
 ## Building Model
 
-With the focal and background data retrieved and the variables selected, I used R to run a random forest model on my training data. I used a 
+With the focal and background data retrieved and the variables selected, I used R to run a random forest model on my final training data. training data cal be found in initial_training_data.csv. I used k-means clustering with three cross-validation folds to test the robustness and accuracy of my model. I found the model to have an averages Area Under Curve (auc) of 0.8391129 across the three folds. 
+
+From this tuned model, I was able to predict both variable importance and create partial dependency plots for each variable. Both are pictured below. R code for the modeling part of this project can be found in 4model_building.R. 
+
+![Charting Variable Importance for All Variables](variable_importance.png "Charting Variable Importance for All Variables")
+![Partial Dependency Plot for All Variables](pdp_plots.png "Partial Dependency Plot for All Variables")
 
 ## Retrieving and Rasterizing All Projected Data :mountain:
 
