@@ -176,6 +176,32 @@ From there, I cleaned the data in a similar manner to the training data process,
 Using the projected land use and climate rasters created in the previous step, I used the below R code to create a projection map for the Amazon that shows the model's probabilistic distribution of the Bichromomyia flaviscutellata vector based on the provided climate and land-use variables. The code used is pasted below, and the distribution map created is also shown. 
 
 ```{r}
-insert map code here
+#------------------------------------------------------------#
+#prediction  map                                             #                                              
+#------------------------------------------------------------#
+
+#path for rasters of each covariate 
+env_data <- list.files(path="/Users/sagemcginley-smith/Desktop/mordecai_lab/sdm_project/tif_files", pattern="tif", all.files=FALSE, full.names=TRUE,recursive=TRUE)
+e <- raster::stack(env_data)
+
+prediction_df <- as.data.frame(rasterToPoints(e)) ##this gets raster value for every grid cell of MDD
+
+#reduce dataset to complete cases
+prediction_df_complete <- prediction_df[complete.cases(prediction_df), ]
+
+#predict probability of species occurrence each 1km grid cell of the area of interest
+predictions <- predict(final_model,
+                       data=prediction_df_complete)
+
+prediction_df_full <- cbind(prediction_df_complete, as.data.frame(predictions$predictions)[,2])
+names(prediction_df_full)[ncol(prediction_df_full)] <- "probability"
+
+#reduce dataset to only the long(x), lat (y), and variable of interest (probability)
+rf_tiff_df <- prediction_df_full[, c("x", "y", "probability")]
+
+rf_sdm_raster <- rasterFromXYZ(rf_tiff_df)
+
+#save raster
+outfile <- writeRaster(rf_sdm_raster, filename='/Users/sagemcginley-smith/Desktop/mordecai_lab/sdm_project/current_projections.tif', format="GTiff",options=c("INTERLEAVE=BAND","COMPRESS=LZW"), overwrite=TRUE)
 ```
 ![Projection Map for Bichromomyia flaviscutellata Distribution in the Amazon Basin](image.jpg "Projection Map for Bichromomyia flaviscutellata Distribution in the Amazon Basin")
