@@ -1,10 +1,15 @@
-# Leishmaniasis SDM Project 
+# Building a Species Distribution Model for Leishmaniasis
 
-Sage McGinley-Smith 
+Sage McGinley-Smith
 
-Mordecai Lab, Stanford University
+[Mordecai Lab](https://www.mordecailab.com/), Stanford University
 
-Winter 2023 
+Mentors: Caroline Glidden and Aly Singleton
+
+Project Funded by Stanford University Vice Provost for Undergraduate Education [Small Grant](https://undergradresearch.stanford.edu/fund-your-project/explore-student-grants/small)
+
+Winter 2023
+
 
 ## Table of Contents :books:
 
@@ -118,7 +123,7 @@ write.csv(climate_data, "/Users/sagemcginley-smith/Desktop/mordecai_lab/sdm_proj
 
 ## Building Model
 
-With the focal and background data retrieved and the variables selected, I used R to run a random forest model on my final training data. training data cal be found in initial_training_data.csv. I used k-means clustering with three cross-validation folds to test the robustness and accuracy of my model. I found the model to have an averages Area Under Curve (auc) of 0.8391129 across the three folds. 
+With the focal and background data retrieved and the variables selected, I used R to run a random forest model on my final training data. Training data can be found in initial_training_data.csv. I used k-means clustering with three cross-validation folds to test the robustness and accuracy of my model and found the model to have an averages Area Under Curve (auc) of 0.8391129 across the three fold tests. 
 
 From this tuned model, I was able to predict both variable importance and create partial dependency plots for each variable. Both are pictured below. R code for the modeling part of this project can be found in 4model_building.R. 
 
