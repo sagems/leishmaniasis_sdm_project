@@ -119,7 +119,8 @@ drop <- c("latitude", "longitude", "row_identifier", "focal","bio5", "bio13", "b
 climate_data <- climate_data[,(names(climate_data) %in% drop)]
 write.csv(climate_data, "/Users/sagemcginley-smith/Desktop/mordecai_lab/sdm_project/initial_training_data.csv")
 ```
-![Correlation Plot for All Variables](corr_plot.png "Correlation Plot for All Variables")
+
+<img src="corr_plot.png" alt="Correlation Plot for All Variables" width="700" height="700" align="center">
 
 ## Building Model
 
@@ -127,8 +128,9 @@ With the focal and background data retrieved and the variables selected, I used 
 
 From this tuned model, I was able to predict both variable importance and create partial dependency plots for each variable. Both are pictured below. R code for the modeling part of this project can be found in 4model_building.R. 
 
-![Charting Variable Importance for All Variables](variable_importance.png "Charting Variable Importance for All Variables")
-![Partial Dependency Plot for All Variables](pdp_plots.png "Partial Dependency Plot for All Variables")
+<img src="variable_importance.png" alt="Charting Variable Importance for All Variables" width="500" height="500">
+
+<img src="pdp_plots.png" alt="Partial Dependency Plot for All Variables" width="600" height="500">
 
 ## Retrieving and Rasterizing All Projected Data :mountain:
 
