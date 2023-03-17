@@ -28,27 +28,27 @@ For the climate data, I used a dataset from CHELSA that captured climatological 
 
 Variables were selected based on hypothesized importance as well as availblility of future projection data. Climate variables collected preliminarily were:
 
-Bio 1 - Mean Annual Air Temperature 
+- Bio 1 - Mean Annual Air Temperature 
 
-Bio 5 - Mean Daily Max Air Temp of the Warmest Month
+- Bio 5 - Mean Daily Max Air Temp of the Warmest Month
 
-Bio 6 - Mean Daily Min Air Temp of the Coldest Month
+- Bio 6 - Mean Daily Min Air Temp of the Coldest Month
 
-Bio 7 - Annual Air Temp Range
+- Bio 7 - Annual Air Temp Range
 
-Bio 12 - Annual Precipitation Amount
+- Bio 12 - Annual Precipitation Amount
 
-Bio 13 - Precipitation in the Wettest Month
+- Bio 13 - Precipitation in the Wettest Month
 
-Bio 14 - Precipitation in the Driest Month
+- Bio 14 - Precipitation in the Driest Month
 
-GSL - Growing Season Length
+- GSL - Growing Season Length
 
-GSP - Total Precipitation on Growing Season Days
+- GSP - Total Precipitation on Growing Season Days
 
-GST - Mean Temperature on Growing Season Days
+- GST - Mean Temperature on Growing Season Days
 
-NPP - Net Primary Productivity
+- NPP - Net Primary Productivity
 
 Descriptions of all climate variables available (via CHELSA): https://chelsa-climate.org/wp-admin/download-page/CHELSA_tech_specification_V2.pdf
 
@@ -77,21 +77,21 @@ Code for this section can be found in 2thinning_for_species.R. The code thins th
 ## Variable Selection :trophy:
 Before running the model, the final step was to select final variables to use in the model. For the sake of conserving computational resources and time, I decided to limit the number of variables I selected to 12. This included the following climate and land use variables: 
 
-Bio 5 - Mean Daily Max Air Temp of the Warmest Month
+- Bio 5 - Mean Daily Max Air Temp of the Warmest Month
 
-Bio 13 - Precipitation in the Wettest Month
+- Bio 13 - Precipitation in the Wettest Month
 
-Bio 14 - Precipitation in the Driest Month
+- Bio 14 - Precipitation in the Driest Month
 
-GSL - Growing Season Length
+- GSL - Growing Season Length
 
-Mean and Difference of Forest Cover 
+- Mean and Difference of Forest Cover 
 
-Mean and Difference of Urban Cover 
+- Mean and Difference of Urban Cover 
 
-Mean and Difference of Wetland Cover 
+- Mean and Difference of Wetland Cover 
 
-Mean and Difference of Mining Cover
+- Mean and Difference of Mining Cover
 
 The variables were thinned to this list using a correlation analysis. The code below displays a correlation plot for the variables (also shown below). If two variables had a correlation greater than 0.70, one variable was eliminated. The chosen eliminated one was selected based on frequency of correlation with other variables, as well as hypothesized importance in the model based on past literature.
 
@@ -131,6 +131,43 @@ From this tuned model, I was able to predict both variable importance and create
 ![Partial Dependency Plot for All Variables](pdp_plots.png "Partial Dependency Plot for All Variables")
 
 ## Retrieving and Rasterizing All Projected Data :mountain:
+
+In order to use the model to make current projection, I collected land use and climate data for the entire Amazon Basin and fed it into my final model to build prediction maps of vector distribution in areas that haven't been sampled for Bichromomyia flaviscutellata. To collect the necessary climate data, I used the following code in Google Earth Engine to generate rasters for each of the climate variables across the designated area: 
+
+```gee
+//this code downloads CHELSA data as decadal averages
+//add shapefiles to make it easy to reduce images to Brazil
+var region = ee.FeatureCollection('users/cglidden/Amazon_Basin');
+var pnt_data = ee.FeatureCollection('users/cglidden/1km_grid_amazon');
+
+
+//read in image collections, conver to images (?), add bands so one giant image collection
+var chelsa = ee.ImageCollection("users/cglidden/CHELSA_1981_2010")
+                  .toBands()
+                  .reproject("EPSG:4326", null, 1000)
+                  .clip(region)
+                  .select("bio5_b1", "bio13_b1", "bio14_b1", "gsl_b1")
+//print(chelsa) //make sure each image is now a band
+
+// run image sample as export -- this exports data for each snail point at a 1km resolution, which is the resolution of the data
+Export.table.toDrive({
+  collection: chelsa.reduceRegions({
+    collection: pnt_data,
+    reducer: ee.Reducer.mean(),
+    scale: 1000,
+    tileScale: 16
+    }),
+  description: 'chelsea_data',
+  folder: 'GEEexports',
+  fileFormat: 'csv',
+  });
+```
+
+Direct link to GEE code for creating climate rasters: https://code.earthengine.google.com/8ddd180d2c775b296e02cea70b47e1ff
+              
+For the land use data, I used GEE to create a csv file containing percentage land coverage data for all 1km^2 buffer regions in the specified area. The code for this section can be found at the following GEE link: https://code.earthengine.google.com/48ed99772fe32dd48b485283c17ef9fc
+
+From there, I cleaned the data in a similar manner to the training data process, and used the 'raster' package in R to convert the values to .tif files. The R code for this section can be found in present_land_use_tifs.R, and all .tif files for both climate and land use can be found in the tif_files folder. 
 
 ## Making Projection Maps :airplane:
 
