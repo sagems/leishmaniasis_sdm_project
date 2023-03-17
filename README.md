@@ -10,9 +10,10 @@ Winter 2023
 
 - [Retrieving Climate and Land Use Data](#one)
 - [Cleaning Training Data in R](#two)
-- [Variable Importance and Selection](#three)
-- [Retrieving and Rasterizing All Projected Data](#four)
-- [Making Projection Maps](#five)
+- [Thinning for Chosen Species](#three)
+- [Variable Importance and Selection](#four)
+- [Retrieving and Rasterizing All Projected Data](#five)
+- [Making Projection Maps](#six)
 
 ## Retrieving Land Use and Climate Data :cloud:
 
@@ -60,12 +61,28 @@ GEE code for land use (amazon): https://code.earthengine.google.com/f7a5b88e2bb9
 
 The next step in building the model was cleaning the training data in R. Full code for this section can be found in 1cleaning_climate_landuse_data.R. 
 
-In summary: 
-
 For the climate data, I adjusted all temperature values to be in Celcius and all precipitation values to be in mm to maintain consistency. For the land use data, I pivoted both the amazon and brazil sheets from wide to long and merged them, calcualting mean and difference values across years for each occurence point. Some occurnece points had data from in the amazon set, while some had data in the Brazil set, but once merged I had land use data from most of the occurence points from the original dataset. I then combined the land use and climate data for each occurence point and created histograms of the resulting values as a way to ensure my calcualtions were relatively correct. Those histograms can be found in the histograms folder of this respository.
 
+## Thinning for Chosen Species
+
+From the cleaned data, I selected a single species to be used as my focal species, and designated the rest of my species to be background data. The focal species I chose was Bichromomyia flaviscutellata, chosen based on sufficiency of data for the individual species, as well as its presence as a competent vector in past literature and predicted competence as a vector based on a model built by Gowri Vadmal (gvadmal@stanford.edu) in the Mordecai Lab. The purpose of selecting a focal species and background species is to account for sampling bias, which might occur if areas that were sampled were considered to be areas where the focal species was not present. Having a focal and background species allows my model to learn associations between variables and the presence or absence of the focal species in areas that were surveyed without being skewed by data from areas where presence of the focal species is unknown. 
+
+Code for this section can be found in 2thinning_for_species.R. The code thins the data using a probability mask and selects appropriate focal and background points. There are roughly twice the number of background points as there are focal points.
+
 ## Variable Importance and Selection :trophy:
+
+
+## Building Model
+
+With the focal and background data retrieved and the variables selected, I used R to run a random forest model on my training data. I used a 
 
 ## Retrieving and Rasterizing All Projected Data :mountain:
 
 ## Making Projection Maps :airplane:
+
+Using the projected land use and climate rasters created in the previous step, I used the below R code to create a projection map for the Amazon that shows the model's probabilistic distribution of the Bichromomyia flaviscutellata vector based on the provided climate and land-use variables. The code used is pasted below, and the distribution map created is also shown. 
+
+```{r}
+insert map code here
+```
+![Projection Map for Bichromomyia flaviscutellata Distribution in the Amazon Basin](image.jpg "Projection Map for Bichromomyia flaviscutellata Distribution in the Amazon Basin")
