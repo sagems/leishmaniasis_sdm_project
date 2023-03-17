@@ -69,8 +69,52 @@ From the cleaned data, I selected a single species to be used as my focal specie
 
 Code for this section can be found in 2thinning_for_species.R. The code thins the data using a probability mask and selects appropriate focal and background points. There are roughly twice the number of background points as there are focal points.
 
-## Variable Importance and Selection :trophy:
+## Variable Selection :trophy:
+Before running the model, the final step was to select final variables to use in the model. For the sake of conserving computational resources and time, I decided to limit the number of variables I selected to 12. This included the following climate and land use variables: 
 
+Bio 5 - Mean Daily Max Air Temp of the Warmest Month
+
+Bio 13 - Precipitation in the Wettest Month
+
+Bio 14 - Precipitation in the Driest Month
+
+GSL - Growing Season Length
+
+Mean and Difference of Forest Cover 
+
+Mean and Difference of Urban Cover 
+
+Mean and Difference of Wetland Cover 
+
+Mean and Difference of Mining Cover
+
+The variables were thinned to this list using a correlation analysis. The code below displays a correlation plot for the variables (also shown below). If two variables had a correlation greater than 0.70, one variable was eliminated. The chosen eliminated one was selected based on frequency of correlation with other variables, as well as hypothesized importance in the model based on past literature.
+
+```{r}
+# install.packages("corrplot")
+library(corrplot)
+library(ggplot2)
+
+climate_land_use <- read.csv("/Users/sagemcginley-smith/Desktop/mordecai_lab/sdm_project/background_occurence_thinned.csv")
+drop <- c("bio1", "bio5", "bio6", "bio12", "bio13", "bio14", "bio7", "gsl", "mean_forest_combined", "diff_forest_combined", 
+          "mean_urban_combined", "diff_urban_combined", "mean_mining_combined", "diff_mining_combined", "mean_wetland_combined", "diff_wetland_combined")
+climate_land_use <- climate_land_use[,(names(climate_land_use) %in% drop)]
+
+data <- cor(climate_land_use)
+
+p <- corrplot.mixed(data,
+               lower = "number", 
+               upper = "circle",
+               tl.col = "black")
+
+climate_data <- read.csv("/Users/sagemcginley-smith/Desktop/mordecai_lab/sdm_project/background_occurence_thinned.csv")
+
+drop <- c("latitude", "longitude", "row_identifier", "focal","bio5", "bio13", "bio14", "gsl", "mean_forest_combined", "diff_forest_combined", 
+          "mean_urban_combined", "diff_urban_combined", "mean_mining_combined", "diff_mining_combined", "mean_wetland_combined", "diff_wetland_combined")
+climate_data <- climate_data[,(names(climate_data) %in% drop)]
+write.csv(climate_data, "/Users/sagemcginley-smith/Desktop/mordecai_lab/sdm_project/initial_training_data.csv")
+```
+![Correlation Plot for All Variables](corr_plot.png "Correlation Plot for All Variablesn")
 
 ## Building Model
 
